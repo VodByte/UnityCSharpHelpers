@@ -14,7 +14,7 @@ public class UGUIUtilityWindow : EditorWindow
 {
     private static UGUIUtilityWindow m_Window;
 
-    [MenuItem("WhirllaxyStudio/uGUIUtility")]
+    [MenuItem("Tools/uGUIUtility")]
     private static void Open()
     {
         if (!m_Window) m_Window = CreateInstance<UGUIUtilityWindow>();
