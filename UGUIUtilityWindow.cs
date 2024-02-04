@@ -44,7 +44,6 @@ public class UGUIUtilityWindow : EditorWindow
     /// <remarks> Pivot 需要是 (0.5, 0.5) </remarks>
     static void AnchorAroundObject()
     {
-        
         var objs = Selection.gameObjects;
         foreach (GameObject o in objs)
         {
@@ -53,8 +52,8 @@ public class UGUIUtilityWindow : EditorWindow
 
         static void Execute(GameObject _o)
         {
-            if (_o != null && _o.GetComponent<RectTransform>() != null)
-            {
+            if (_o == null || _o.GetComponent<RectTransform>() == null) return;
+            
             var r = _o.GetComponent<RectTransform>();
             Undo.RecordObject(r, "Set anchors around object");
             var p = _o.transform.parent.GetComponent<RectTransform>();
@@ -64,13 +63,14 @@ public class UGUIUtilityWindow : EditorWindow
             var _anchorMin = r.anchorMin;
             var _anchorMax = r.anchorMax;
 
-            var parent_width = p.rect.width;
-            var parent_height = p.rect.height;
+            var rect = p.rect;
+            var parentWidth = rect.width;
+            var parentHeight = rect.height;
 
-            var anchorMin = new Vector2(_anchorMin.x + (offsetMin.x / parent_width),
-                                        _anchorMin.y + (offsetMin.y / parent_height));
-            var anchorMax = new Vector2(_anchorMax.x + (offsetMax.x / parent_width),
-                                        _anchorMax.y + (offsetMax.y / parent_height));
+            var anchorMin = new Vector2(_anchorMin.x + offsetMin.x / parentWidth,
+                                        _anchorMin.y + offsetMin.y / parentHeight);
+            var anchorMax = new Vector2(_anchorMax.x + offsetMax.x / parentWidth,
+                                        _anchorMax.y + offsetMax.y / parentHeight);
 
             r.anchorMin = anchorMin;
             r.anchorMax = anchorMax;
@@ -78,7 +78,6 @@ public class UGUIUtilityWindow : EditorWindow
             r.offsetMin = new Vector2(0, 0);
             r.offsetMax = new Vector2(0, 0);
             r.pivot = new Vector2(0.5f, 0.5f);
-            }
         }
     }
 
@@ -93,36 +92,36 @@ public class UGUIUtilityWindow : EditorWindow
         }
 
         static void Execute(GameObject _o)
-        { 
-            if (_o != null && _o.GetComponent<RectTransform>() != null)
-            {
-                var r = _o.GetComponent<RectTransform>();
-                Undo.RecordObject(r, "Set anchors around object");
-                var p = _o.transform.parent.GetComponent<RectTransform>();
+        {
+            if (_o == null || _o.GetComponent<RectTransform>() == null) return;
+            
+            var r = _o.GetComponent<RectTransform>();
+            Undo.RecordObject(r, "Set anchors around object");
+            var p = _o.transform.parent.GetComponent<RectTransform>();
 
-                var offsetMin = r.offsetMin;
-                var offsetMax = r.offsetMax;
-                var _anchorMin = r.anchorMin;
-                var _anchorMax = r.anchorMax;
+            var offsetMin = r.offsetMin;
+            var offsetMax = r.offsetMax;
+            var _anchorMin = r.anchorMin;
+            var _anchorMax = r.anchorMax;
 
-                var parent_width = p.rect.width;
-                var parent_height = p.rect.height;
-                var _halfWidth = r.rect.width / 2.0f;
-                var _halfHeight = r.rect.height / 2.0f;
+            var parentRect = p.rect;
+            var parentWidth = parentRect.width;
+            var parentHeight = parentRect.height;
 
-                var anchorMin = new Vector2(
-                      _anchorMin.x + ((offsetMin.x + _halfWidth) / parent_width)
-                    , _anchorMin.y + ((offsetMin.y + _halfHeight) / parent_height));
-                var anchorMax = new Vector2(
-                      _anchorMax.x + ((offsetMax.x - _halfWidth) / parent_width)
-                    , _anchorMax.y + ((offsetMax.y - _halfHeight) / parent_height));
-                r.anchorMin = anchorMin;
-                r.anchorMax = anchorMax;
+            var tempRect = r.rect;
+            var _halfWidth = tempRect.width / 2.0f;
+            var _halfHeight = tempRect.height / 2.0f;
 
-                r.offsetMin = new Vector2(-_halfWidth, -_halfHeight);
-                r.offsetMax = new Vector2(_halfWidth, _halfHeight);
-                r.pivot = new Vector2(0.5f, 0.5f);
-            }
+            var anchorMin = new Vector2(_anchorMin.x + (offsetMin.x + _halfWidth) / parentWidth,
+                                        _anchorMin.y + (offsetMin.y + _halfHeight) / parentHeight);
+            var anchorMax = new Vector2(_anchorMax.x + (offsetMax.x - _halfWidth) / parentWidth,
+                                        _anchorMax.y + (offsetMax.y - _halfHeight) / parentHeight);
+            r.anchorMin = anchorMin;
+            r.anchorMax = anchorMax;
+
+            r.offsetMin = new Vector2(-_halfWidth, -_halfHeight);
+            r.offsetMax = new Vector2(_halfWidth, _halfHeight);
+            r.pivot = new Vector2(0.5f, 0.5f);
         }
     }
 }
